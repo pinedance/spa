@@ -1,0 +1,151 @@
+<html ng-app="myapp">
+
+    <head>
+		<meta charset="utf-8">
+        <title>rePlacer</title>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+        <!--<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css" rel="stylesheet">-->
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">	
+    </head>
+    
+    <body ng-controller="MainCtrl">
+
+        <header>
+            <div class="jumbotron">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <h1>rePlacer</h1>
+                        </div>
+                        <div class="col-sm-6">
+                            <br/>
+                            <h1 ng-repeat="msg in msgs" ng-show="phase===$index">
+                                <small><span ng-class="msg.glyphicon" aria-hidden="true"></span> {{ msg.message }}</small>
+                            </h1>
+                        </div>
+                        <div class="col-sm-2">
+                            <br /><br />
+                            <button class="btn btn-danger btn-lg" ng-click="init('all')">Reset</button>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <div class="panel panel-primary">
+                                <div class="panel-heading">
+                                    <h3 class="panel-title">{{ msgs[0].message }}</h3>
+                                </div>
+                                <div class="panel-body">
+                                    <input type="file" id='fileInput' title="Input your file" on-read-file="showContent($file)">
+                                    <br/>
+                                    <div ng-show="file" class="alert alert-info" role="alert">File content is uploaded(size : {{file.size}} )</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="panel panel-primary">
+                                <div class="panel-heading">
+                                    <h3 class="panel-title">{{ msgs[2].message }}</h3>
+                                </div>
+                                <div class="panel-body">
+                                    <button ng-show="phase > 1" class="btn btn-warning"  ng-click="convert()">rePlace</button>
+                                    <br /><br />
+                                    <div ng-show="converted_content" class="alert alert-info" role="alert">File content is <strong>{{info.replaceTimes}}</strong> times replaced</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="panel panel-primary">
+                                <div class="panel-heading">
+                                    <h3 class="panel-title">{{ msgs[3].message }}</h3>
+                                </div>
+                                <div class="panel-body">
+                                    <div ng-show="phase > 2">
+                                    <input type='text' placeholder="output file name" ng-model="outputFilename" ng-keyup="chageFilename(outputFilename)"/>
+                                    <a id="saveFile" class="btn btn-warning" ng-click="saveFile()" ng-href="{{ url }}" download="result.txt">Save</a>
+                                    <br/><br />
+                                    <div ng-show="phase===4" class="alert alert-info" role="alert">Good Job!</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-4">
+                    <div class="panel panel-success">
+                      <div class="panel-heading">Text Content (less than 300kb)</div>
+                      <div class="panel-body" ng-show="file"><pre>{{ file.content.substring(0, 300) + "... ..." }}</pre></div>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="panel panel-success">
+                        <div class="panel-heading">Word Sets</div>
+                        <div class="panel-body" >
+                            <textarea class="form-control" rows="12" ng-model="myWordsets" ng-trim="false" ng-change="getMyWordsets($event)"></textarea>
+                            <br/>
+                            <button class="btn btn-default" ng-click="init('wordsets')">Reset Wordsets</button>
+                        </div>
+                    </div>
+                    
+                    <div class='well'>
+                        <p><span class="label label-default">입력예시</span></p>
+                        <pre>
+# 각각의 pair 구분은 enter
+# pair에서 before와 after의 구분은 tab
+AA   aa    # 각각은 ReExp로 인식
+BB   bb  
+(A)(B)    $2$1 # 병치구문은 $1, $2
+
+# 빈 줄과 '#' 이후의 주석은 실행하지 않음
+# 공백도 내용으로 인식하기 때문에 주의 요망</pre> 
+                        <p><span class="label label-default">주의사항</span></p>
+                        <p>입력 완류 후에도 오른쪽 테이블이 나타나지 않으면 syntax error 입니다. </p>
+                        <p>한자 이중코드는 자동으로 통일됩니다. </p>
+                        <p><a href="https://github.com/pinedance/pinedance.github.io/issues" target=_blank><span class="label label-default">개선사항, 오류보고</span></a></p>
+                    </div>
+                </div>
+                
+                <div class="col-sm-4">
+                    <div class="panel panel-success">
+                        <table class="table table-hover table-condensed">
+                            <thead>
+                                <tr>
+                                    <th >Loop?</th>
+                                    <th >Before</th>
+                                    <th >After</th>
+                                    <th >Replace Times</th>
+
+                                </tr>
+                            </thead>
+                            <tbody ng-if="myWordsets">
+                                <tr ng-repeat="wordset in wordsets" >
+                                    <th ng-class="{warning: wordset[3]}">{{wordset[3]}}</th>
+                                    <th>{{wordset[0]}}</th>
+                                    <th>{{wordset[1]}}</th>
+                                    <th ng-class="{info: wordset[2]===0}">{{wordset[2]}}</th>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    
+    <!-- ---------------------------------------------------------------- -->
+        <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+        <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular.min.js"></script>
+        
+        <script type="text/javascript" src="../publicAsset/javascript/underscore/underscore-min.js"></script>
+        <script type="text/javascript" src="../publicAsset/ng-modules/ng-underscore.js"></script>
+        
+        <script type="text/javascript" src="../publicAsset/javascript/exString.js"></script>
+        <script type="text/javascript" src="./replacer.js"></script>
+    
+    </body>
+</html>

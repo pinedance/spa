@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+    <title>my jukebox</title>
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css"/>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<style type="text/css"></style>
+</head>
+
+<body ng-app="myApp" ng-controller="mainCtrl">
+	<header>
+		<div class="jumbotron">
+			<div class="container">
+			
+			<div class="row">
+				<div class="col-md-3 col-xs-6">
+					<img src="http://cfile22.uf.tistory.com/image/2373E2335293CD600DC795" alt="" width="100%" class="pull-right img-responsive img-rounded">  
+				</div>
+				
+				<div class="col-md-9 col-xs-6">
+					<h1>Juke box
+						<span>
+							<button type="button" class="btn btn-danger btn-lg" ng-click="login()" ng-hide="onState('login')"><span class="glyphicon glyphicon-log-in" aria-hidden="true"></span></button>
+							<button type="button" class="btn btn-info btn-lg" ng-click="logout()" ng-show="onState('login')"><span class="glyphicon glyphicon-log-out" aria-hidden="true"></span></button>
+						</span>
+					</h1>
+					<h3>{{ currentSong.title }} 
+                        <span class="label label-default">{{ currentSong.artist }}</span>
+					    <small>&nbsp;&nbsp;&nbsp;{{ jukebox.state.runTime | secondsToDateTime | date:'mm:ss'}}</small>
+				    </h3>
+					<br>
+					<div ng-show="onState('login')">
+						<button type="button" class="btn btn-default btn-lg" ng-click="jukebox.ctrl.previous()"><span class="glyphicon glyphicon-step-backward" aria-hidden="true"></span></button>
+						<button type="button" class="btn btn-success btn-lg" ng-click="jukebox.ctrl.play()" ng-show="!jukebox.state.isPlay()"><span class="glyphicon glyphicon-play" aria-hidden="true"></span></button>
+						<button type="button" class="btn btn-danger btn-lg" ng-click="jukebox.ctrl.pause()" ng-show="jukebox.state.isPlay()"><span class="glyphicon glyphicon-pause" aria-hidden="true"></span></button>
+						<button type="button" class="btn btn-default btn-lg" ng-click="jukebox.ctrl.next()"><span class="glyphicon glyphicon-step-forward" aria-hidden="true"></span></button>
+						<button type="button" ng-class="{'btn btn-lg btn-warning': random, 'btn btn-lg btn-default': !random}" ng-click="randomize()"><span class="glyphicon glyphicon-random" aria-hidden="true"></span></button>
+						<button type="button" class="btn btn-default btn-lg" ng-click="jukebox.ctrl.mute()"><span ng-class="{'glyphicon glyphicon-volume-off':jukebox.state.isMuted(), 'glyphicon glyphicon-volume-up':!jukebox.state.isMuted()}" aria-hidden="true"></span></button>
+					</div>
+	                <youtube id="{{ytPlayerData.id}}" width="0" height="0"></youtube>
+	                <div class="progress">
+	                      <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="{{ytPlayer.getCurrentTime()}}" aria-valuemin="4" aria-valuemax="100" ng-style="{ 'min-width': '4em', width: jukebox.state.progress() }">
+	                          <span ng-if="ytPlayer.getCurrentTime()">{{ ytPlayer.getCurrentTime() | secondsToDateTime | date:'mm:ss'}}</span>
+	                      </div>
+	                      <!-- http://stackoverflow.com/questions/20861313/change-bootstrap-progress-bar-width-from-angularjs -->
+	                </div>
+				</div>
+
+            </div> <!--row-->
+			</div> <!--container-->
+		</div>
+
+	</header>
+
+	<div class="container" ng-show="onState('login')">
+	    <div class="row">
+	    	<div class="col-md-3 col-xs-6">
+            	<div class="panel panel-default">
+				    <!-- Default panel contents -->
+				    <div class="panel-heading">
+				    	Play List
+				    </div>
+				    <ul class="list-group">
+					    <li class="list-group-item" style="cursor:pointer" ng-repeat="listname in playlists" ng-click="reloadPlayList(listname)" ng-class="{'list-group-item-success':listname===currentPlaylist}">
+					    	{{listname}}
+					    </li>
+					</ul>
+				</div>				
+				<input type="text" class="form-control" ng-model="newNamedPlaylist" ng-keypress="renamePlayList($event)" ng-show="editingPlayList"></br>
+				<input type="text" class="form-control" ng-model="newPlaylist" ng-keypress="addPlayList($event)" ng-hide="editingPlayList" placeholder="add new playlist then enter"></br>
+
+		    	<button type="button" class="btn btn-default btn-sm pull-right">
+					<span ng-click="deletePlayList()" class="glyphicon glyphicon-remove-circle " aria-hidden="true"></span>
+		    	</button>
+
+			    <button type="button" class="btn btn-default btn-sm pull-right">
+		    		<span ng-click="editPlayList()" class="glyphicon glyphicon-edit" aria-hidden="true"></span>	
+		    	</button>
+            </div>
+	    	
+            <div class="col-md-9 col-xs-6">
+				<table class="table table-hover">
+                    <caption>
+                    </caption>
+					<thead>
+						<tr>
+							<th></th>
+							<th></th>
+							<th>Title</th>
+							<th>Artist</th>
+							<th>URL</th>	
+							<th></th>
+							<th></th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr ng-repeat="song in songs" ng-class="{info: song == currentSong}">
+							<th><span style="cursor:pointer" ng-click="up(song)" class="glyphicon glyphicon-collapse-up" aria-hidden="true"></span></th>
+							<th><span style="cursor:pointer" ng-click="down(song)" class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span></th>
+							<th ng-click="jukebox.ctrl.playThis($index)" style="cursor:pointer">{{song.title}}</th>
+							<th>{{song.artist}}</th>
+							<th><small><a ng-href="{{song.url}}" target="_blank">{{ "... " + youtube_url2id(song.url) + " ..." }}</a></small></th>
+							<th><span style="cursor:pointer" ng-click="delete(song)" class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span></th>
+							<th><span style="cursor:pointer" ng-click="edit(song)" class="glyphicon glyphicon-edit" aria-hidden="true"></span></th>
+						</tr>
+					</tbody>
+					<tfoot ng-if="!editing">
+						<th></th>
+						<th><span ng-click="add(newSong)" class="glyphicon glyphicon-check" aria-hidden="true"></span></th>
+						<th><input ng-model='newSong.title' type='text' placeholder='title'></th>
+						<th><input ng-model='newSong.artist' type='text' placeholder='artist'></th>
+						<th><input ng-model='newSong.url' type='text' placeholder='url'></th>
+						<th></th>
+						<th></th>
+					</tfoot>
+					<tfoot ng-if="editing">
+						<th></th>
+						<th><span ng-click="update(updatedSong)" class="glyphicon glyphicon-check" aria-hidden="true"></span></th>
+						<th><input ng-model='updatedSong.title' type='text'></th>
+						<th><input ng-model='updatedSong.artist' type='text'></th>
+						<th><input ng-model='updatedSong.url' type='text'></th>
+						<th></th>
+						<th></th>
+					</tfoot>
+				</table>
+			</div> <!-- col -->
+			
+		</div> <!-- row -->
+	</div> <!-- container -->
+
+<!--   script...............................................................................................-->
+	<!-- bootstrap -->
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+	<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+	<!-- angularjs -->
+    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.4.5/angular.min.js"></script>
+	<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.4.5/angular-route.min.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.4.5/angular-cookies.min.js"></script>
+	<!-- firebase -->
+    <script src="//cdn.firebase.com/js/client/2.0.4/firebase.js"></script>
+	<script src="//cdn.firebase.com/libs/angularfire/0.9.2/angularfire.min.js"></script>	
+	<!-- youtube -->
+    <script src="//www.youtube.com/iframe_api"></script>
+	<script src="./youtube-embed.js"></script>
+	<!-- angulr prompt ( https://github.com/cgross/angular-prompt ) -->
+	<script src="../publicAsset/javascript/ui-bootstrap-tpls-0.13.0.min.js"></script>	
+	<script src="../publicAsset/ng-modules/angular-prompt.js"></script> 
+	<!-- custom -->
+	<script src="../publicAsset/javascript/exArray.js"></script>
+	<script src="./jukebox.js"></script>
+
+</body>
+
+</html>

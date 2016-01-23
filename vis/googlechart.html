@@ -1,0 +1,46 @@
+<html>
+<head>
+
+
+</head>
+<body>
+	<!-- word tree -->
+	
+	<div id='wordtree_basic' style='width: 800px; height: 800px;'></div>
+	
+	<form id='myword'>
+	  <label for='word'>WORD :</label>
+	  <input name='char' type='text' value='風'>
+	  <label for='type'>TYPE :</label>
+	  <label class='radio-inline'>
+		<input>prefix</input>
+	  </label>
+	  <label class='radio-inline'>
+		<input>double</input>
+	  </label>
+	  <label class='radio-inline'>
+		<input>suffix</input>
+	  </label>
+	  <input name='submit' type='submit' value='Search'>
+	</form>
+	
+	<!-- word sankey -->	
+	<div id="sankey_basic" style="width: 900px; height: 300px;"></div>
+	
+	
+	
+	
+	
+	<!-- google chart -->	
+	<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+	
+	<!-- word sankey -->	
+	<script type="text/javascript" src="./google_sankey/data.js"></script>
+	<script type="text/javascript" src="./google_sankey/custom.js"></script>	
+	
+	<!-- word tree -->
+	<script type="text/javascript" src="./google_wordtree/data.js"></script>
+	<script type="text/javascript" src="./google_wordtree/custom.js"></script>	
+
+</body>
+</html>
