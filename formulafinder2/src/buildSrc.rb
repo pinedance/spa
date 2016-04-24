@@ -128,7 +128,7 @@ rst_json_str = rst_json.to_s.gsub(/(\d)\.(\d)/, '\1,\2')
 result.puts(rst_json_str)
 
 result2 = File.open("sanghan_herbs.json", 'w')
-result2.puts($gherbs.uniq)
+result2.puts($gherbs.uniq.inspect)
 
 
 
