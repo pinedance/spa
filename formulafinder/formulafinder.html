@@ -46,9 +46,9 @@
 		<div class="row">
 			<div class="col-sm-6">
 				<div class="well" id="formulaDetail">
-					<p>처방명 : {{detail.txName}}</p>
-					<p>방극 : {{detail.txFangi}}<p>
-					<p>구성 : {{detail.txGoo}}<p>
+					<p ng-bind="'처방명 : ' + detail.txName"></p>
+					<p ng-bind="'방극 : ' + detail.txFangi"><p>
+					<p ng-bind="'구성 : ' + detail.txGoo"><p>
 					<button type="button" class="btn btn-default" ng-repeat="h in herbdetails" ng-click="showHerbDetail(h)" >{{h}}</button>
 					<blockquote><p>{{yack}}</p></blockquote>
 				</div>
