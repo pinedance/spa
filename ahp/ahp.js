@@ -3,7 +3,7 @@ underscore.factory('_', ['$window', function($window) {
   return $window._; // assumes underscore has already been loaded on the page
 }]);
 
-var app = angular.module('ahp', ['underscore']);
+var app = angular.module('ahp', ['underscore', 'googlechart']);
 
 app.controller('ahpCtrl', ["$scope", "_", function($scope, _) {
 
@@ -14,9 +14,9 @@ app.controller('ahpCtrl', ["$scope", "_", function($scope, _) {
   }  // more inportant factor
   var randomConsistencyIndex = [0,0,0,0.58,0.9,1.12,1.24,1.32,1.41,1.45,1.49]
   $scope.intensitys = [1,3,5,7,9]
-  $scope.myGoal = "Choose the best car for the family"
-  $scope.myCris = "Cost, Safety, Style" // "Cost, Safety, Style, Capacity"
-  $scope.myAlts = "Accord Sedan, Pilot SUV, CR-V SUV, Odyssey Minivan" // "Accord Sedan, Accord Hybrid Sedan, Pilot SUV, CR-V SUV, Element SUV, Odyssey Minivan"
+  $scope.myGoal = "점심에 뭘 먹을까?"//"Choose the best car for the family"
+  $scope.myCris = "맛,값,거리"//"Cost, Safety, Style" // "Cost, Safety, Style, Capacity"
+  $scope.myAlts = "짜장면,국밥,돈까스,백반"//"Accord Sedan, Pilot SUV, CR-V SUV, Odyssey Minivan" // "Accord Sedan, Accord Hybrid Sedan, Pilot SUV, CR-V SUV, Element SUV, Odyssey Minivan"
 
   $scope.creatWorkSheet = function(){
     console.log( $scope.myGoal )
@@ -24,8 +24,8 @@ app.controller('ahpCtrl', ["$scope", "_", function($scope, _) {
     myAlts = _.uniq( _.compact( $scope.myAlts.split(/\s*,\s*/) ) )
     console.log(myCris)
     // criterias
-    pairsCris = selectPair( myCris )  // create pairs for Pairwise comparing
-    $scope.jgmCris = _.map(pairsCris, createJugementSpace ) // create judgement space
+    pairsCris = selectPair( myCris )  // create pairs for Pairwise comparing, Array
+    $scope.jgmCris = _.map(pairsCris, createJugementSpace ) // create judgement space, Array
 
     // alternatives
     pairsAlts = selectPair( myAlts )  // create pairs for Pairwise comparing
@@ -89,6 +89,7 @@ app.controller('ahpCtrl', ["$scope", "_", function($scope, _) {
     } else {
       $scope.currentPage = direction
     }
+    console.log ('currentPage'); console.log( $scope.currentPage)
   }
 
   // n x m 행렬 만들고, 1 채워 넣기
@@ -164,7 +165,7 @@ app.controller('ahpCtrl', ["$scope", "_", function($scope, _) {
     var tmpMx = getJudgementMx(factor, judgementData)
     var productedMx = multiplyMatrix(tmpMx, tmpMx)
     var rst = lowdown( rowSum(productedMx) )
-    return rst
+    return _.zip(factor, rst)
   }
 
   function calculateLambdaMax(factor, judgementData){
@@ -184,25 +185,80 @@ app.controller('ahpCtrl', ["$scope", "_", function($scope, _) {
     return { "lambdaMax": lambdaMax, "ci": ci, "cr": cr }
   }
 
-  $scope.report = function(){
-      // criterias
+  $scope.reportCris = function(){
+      // calculate criterias
       var globalCris = calculatePV(myCris, $scope.jgmCris)
       var globalCrisIdx = calculateIdn(myCris, $scope.jgmCris)
       console.log( globalCris); console.log( globalCrisIdx)
 
+      // report message
+      var tmpmsg = ( globalCrisIdx.cr <= 10)? "일관된 기준을 가지셨군요!!!" : "마음을 정리하고 다시 해보시는게 좋겠어요"
+      tmpmsg = tmpmsg + " (CR: " + globalCrisIdx.cr.toFixed(2) + " %)"
+      $scope.crisMsg = globalCrisIdx.message = createMsg(globalCrisIdx.cr)
+
+      // report pie chart
+      // var pieData = _.zip(myCris, globalCris.map(function(e,i,arr){return (e * 100).toFixed(2) } ) )
+      $scope.crisPieChart = createPieChart(['Component', '중요도'], globalCris);
+      $scope.globalCris = globalCris
+  }
+
+  $scope.reportAlts = function(){
       // alternatives
       var localAlts = []
       for(var i=0;i<$scope.jgmAlts.length;i++){
-        console.log($scope.jgmAlts[i])
-        localAlts[i] = calculatePV(myAlts, $scope.jgmAlts[i].alts)
+        localAlts[i] = {
+          pv: calculatePV(myAlts, $scope.jgmAlts[i].alts),
+          idx: calculateIdn(myAlts, $scope.jgmAlts[i].alts)
+        }
+        localAlts[i].msg = createMsg( localAlts[i].idx.cr),
+        localAlts[i].pieChart = createPieChart(['Component', '중요도'], localAlts[i].pv )
+
       }
+      // console.log (localAlts)
 
-      console.log( localAlts)
-      var globalAlts = _.map( _.unzip( localAlts ), function(e){
-        return productArrays(globalCris, e)
+      var tmplocalAlts = _.map( localAlts, function(e){ return _.unzip( e.pv)[1] })
+      var tmpglobalAlts = _.unzip(tmplocalAlts )
+      var tmpglobalCris = _.unzip($scope.globalCris)[1]
+      var globalAlts = _.map( tmpglobalAlts, function(e){
+          return productArrays( tmpglobalCris, e)
       })
+      var globalAlts = _.zip(myAlts, globalAlts)
+      console.log( tmplocalAlts )
+      console.log( tmpglobalAlts )
+      console.log( tmpglobalCris )
+      console.log( globalAlts )
 
-      console.log( globalAlts)
+      $scope.localAlts = localAlts
+      $scope.globalAltsPieChart = createPieChart(['Component', '중요도'], globalAlts )
+  }
+
+  function createMsg(cr){
+    var tmpmsg = ( cr <= 10)? "일관된 기준을 가지셨군요!!!" : "마음을 정리하고 다시 해보시는게 좋겠어요"
+    tmpmsg += " (CR: " + cr.toFixed(2) + " %)"
+    return tmpmsg
+  }
+
+  function createPieChart(label, data){ // http://plnkr.co/edit/E4iPtQ?p=preview
+      var chart1 = {};
+      chart1.type = "PieChart";
+      chart1.data = [label].concat(data);
+
+      chart1.options = {
+          displayExactValues: true,
+          width: 400,
+          height: 200,
+          is3D: false,
+          chartArea: {left:10,top:10,bottom:0,height:"100%"}
+      };
+
+      chart1.formatters = {
+        number : [{
+          columnNum: 1,
+          pattern: "#,##0.00 %"
+        }]
+      };
+      console.log(chart1)
+      return chart1;
   }
 
 }]);
