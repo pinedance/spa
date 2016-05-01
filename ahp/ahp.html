@@ -5,13 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="http://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
     <link href="http://pingendo.github.io/pingendo-bootstrap/themes/default/bootstrap.css" rel="stylesheet" type="text/css">
-
+    <style>
+      /* when showing the picture */
+      .ng-hide-remove      { animation:0.5s flipInX ease; }
+    </style>
     <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
     <script type="text/javascript" src="http://netdna.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
+    <script type="text/javascript" src="undermatrix.js"></script>
 
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.1/angular.min.js"></script>
-    <script src="https://bouil.github.io/angular-google-chart/ng-google-chart.js"></script>
+    <!-- <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.1/angular-animate.min.js"></script> -->
+    <script type="text/javascript" src="https://bouil.github.io/angular-google-chart/ng-google-chart.js"></script>
     <script type="text/javascript" src="ahp.js"></script>
 
 </head>
@@ -20,8 +25,10 @@
 
 <div ng-include="'parts/navibar.html'"></div>
 
+<!-- header -->
 <div class="section" ng-include="'parts/header.html'"></div>
 
+<!-- Set Goal, Criterias, and alternatives -->
 <div class="section">
   <div class="container">
     <div class="row">
@@ -43,75 +50,76 @@
         </form>
       </div>
     </div>
-    <hr>
   </div>
 </div>
 
+<hr ng-if="showCriWorkSheet" >
+
+<!-- get criterias intensitys and show result -->
 <div class="section" ng-if="showCriWorkSheet">
   <div class="container">
     <div class="row">
       <div class="col-md-12">
         <h2>Jedge more important criterias</h2>
-        <br>
       </div>
     </div>
+  </div>
+
+  <div class="container">
     <div class="row" ng-repeat="cri in jgmCris">
-      <div class="col-md-12">
-            <div class="btn-group col-md-6">
-              <button class="btn btn-default"  ng-bind="$index + 1"></button>
-              <button class="btn" ng-class="{'btn-default': cri.pair[0]!==cri.moreImpFact, 'btn-primary': cri.pair[0]===cri.moreImpFact }"
-                  ng-bind="cri.pair[0]" ng-click="judgeFactor( cri, cri.pair[0], cri.pair[1] )"></button>
-              <button class="btn" ng-class="{'btn-default': cri.pair[1]!==cri.moreImpFact, 'btn-primary': cri.pair[1]===cri.moreImpFact }"
-                  ng-bind="cri.pair[1]" ng-click="judgeFactor( cri, cri.pair[1], cri.pair[0] )"></button>
-            </div>
-            <div class="btn-group col-md-6">
-              <button type="button"  ng-repeat="int in intensitys"
-                  class="btn" ng-class="{'btn-default': int!==cri.intensity, 'btn-primary': int===cri.intensity }"
-                  ng-click="judgeIntens( cri, int )" ng-bind="int"></button>
-            </div>
+      <div class="col-sm-6">
+        <div class="btn-group">
+          <button class="btn" ng-class="{'btn-warning': !(cri.moreImpFact && cri.intensity), 'btn-success': (cri.moreImpFact && cri.intensity) }"
+              ng-bind="$index + 1"></button>
+          <button class="btn" ng-class="{'btn-default': cri.pair[0]!==cri.moreImpFact, 'btn-primary': cri.pair[0]===cri.moreImpFact }"
+              ng-bind="cri.pair[0]" ng-click="judgeFactor( cri, cri.pair[0], cri.pair[1] )"></button>
+          <button class="btn" ng-class="{'btn-default': cri.pair[1]!==cri.moreImpFact, 'btn-primary': cri.pair[1]===cri.moreImpFact }"
+              ng-bind="cri.pair[1]" ng-click="judgeFactor( cri, cri.pair[1], cri.pair[0] )"></button>
+        </div>
       </div>
-      <div class="col-md-12">
+      <div class="col-sm-6">
+        <div class="btn-group">
+          <button type="button"  ng-repeat="int in intensitys"
+              class="btn" ng-class="{'btn-default': int!==cri.intensity, 'btn-primary': int===cri.intensity }"
+              ng-click="judgeIntens( cri, int )" ng-bind="int"></button>
+        </div>
+      </div>
+      <!-- <div class="col-md-12">
         <div class="col-md-6">
           <pre ng-bind="cri.judgementMessage"></pre>
         </div>
         <div class="form-group col-md-6">
             <input class="form-control" placeholder="memo " type="text" ng-model="cri.rationale">
         </div>
+      </div> -->
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-12">
+        <h2>기준에 대한 결과를 확인해 보세요 <span><button class="btn btn-default" ng-click="reportCris()">Report</button></span></h2>
+        <p ng-bind="crisMsg"></p>
       </div>
     </div>
 
     <div class="row">
-      <div class="col-md-6">
-        <h2>기준에 대한 결과를 확인해 보세요</h2>
-      </div>
-      <div class="col-md-6">
-        <button class="btn btn-default" ng-click="reportCris()">Report</button>
-      </div>
-      <div class="col-md-12">
-        <p ng-bind="crisMsg"></p>
-        <div google-chart chart="crisPieChart" style="border:1px inset black;padding:0;width:400px"></div>
-        <!-- <div google-chart chart="crisPieChart"></div> -->
-      </div>
-    </div>
-
-  </div>
-</div>
-
-<div class="section " ng-if="showAltWorkSheet">
-  <div class="container ">
-    <div class="row ">
-      <div class="col-md-12 ">
-        <div class="progress ">
-          <div class="progress-bar " role="progressbar " style="width: 60%; ">60% Complete</div>
-        </div>
+      <div class="col-sm-12 text-center">
+        <!-- <div google-chart chart="crisPieChart" style="border:1px inset black;padding:0;width:400px"></div> -->
+        <!-- <div google-chart chart="crisPieChart" style="height:600px; width:100%;"></div> -->
+        <div google-chart chart="crisPieChart" style=""></div>
       </div>
     </div>
   </div>
+
 </div>
 
+
+
+<hr ng-if="showAlts" >
 <!-- start judgement alternatives -->
-<!-- <div class="section" ng-repeat="jgmAlt in jgmAlts" ng-if="showAltWorkSheet" ng-show="($index+1)===currentPage"> -->
-<div class="section" ng-repeat="jgmAlt in jgmAlts" ng-if="showAltWorkSheet" ng-show="($index+1)===currentPage">
+
+<div class="section" ng-repeat="jgmAlt in jgmAlts" ng-if="showAlts" ng-show="($index+1)===currentPage">
   <div class="container" >
 
     <div class="row" >
@@ -125,14 +133,15 @@
     <div class="row" ng-repeat="alt in jgmAlt.alts">
       <div class="col-sm-6">
             <div class="btn-group">
-              <button class="btn btn-default"  ng-bind="$index + 1"></button>
+              <button class="btn" ng-class="{'btn-warning': !(alt.moreImpFact && alt.intensity), 'btn-success': (alt.moreImpFact && alt.intensity) }"
+                  ng-bind="$index + 1"></button>
               <button class="btn" ng-class="{'btn-default': alt.pair[0]!==alt.moreImpFact, 'btn-primary': alt.pair[0]===alt.moreImpFact }"
                   ng-bind="alt.pair[0]" ng-click="judgeFactor( alt, alt.pair[0], alt.pair[1] )"></button>
               <button class="btn" ng-class="{'btn-default': alt.pair[1]!==alt.moreImpFact, 'btn-primary': alt.pair[1]===alt.moreImpFact }"
                   ng-bind="alt.pair[1]" ng-click="judgeFactor( alt, alt.pair[1], alt.pair[0] )"></button>
             </div>
       </div>
-      <div class="col-sm-6"
+      <div class="col-sm-6">
             <div class="btn-group">
               <button type="button" ng-repeat="int in intensitys"
                   class="btn" ng-class="{'btn-default': int!==alt.intensity, 'btn-primary': int===alt.intensity }"
@@ -145,7 +154,7 @@
 </div>  <!-- section -->
 <!-- end judgement alternatives -->
 
-<div class="section " ng-if="showAltWorkSheet">
+<div class="section " ng-if="showAlts">
   <div class="container ">
     <div class="row text-center ">
       <div class="col-md-12 ">
@@ -165,21 +174,27 @@
     </div>
 
     <div class="row">
-      <div class="col-md-6">
-        <h2>최종 결과를 확인해 보세요</h2>
+      <div class="col-md-12">
+        <h2>최종 결과를 확인해 보세요
+           <span>
+             <button class="btn btn-default" ng-click="reportAlts()">Report</button>
+           </span>
+         </h2>
       </div>
-      <div class="col-md-6">
-        <button class="btn btn-default" ng-click="reportAlts()">Report</button>
-      </div>
-      <div class="col-md-3" ng-repeat="localAlt in localAlts">
+    </div>
+
+    <div class="row" ng-repeat="localAlt in localAlts">
+      <div class="col-md-12" >
         <p ng-bind="localAlt.msg"></p>
-        <div google-chart chart="localAlt.pieChart" style="border:1px inset black;padding:0;width:400px"></div>
-        <!-- <div google-chart chart="crisPieChart"></div> -->
+        <div google-chart chart="localAlt.pieChart"></div>
       </div>
     </div>
 
     <div class="row">
-        <div google-chart chart="globalAltsPieChart" style="border:1px inset black;padding:0;width:400px"></div>
+      <div class="col-md-12" >
+        <p>최후의 속마음은?</p>
+        <div google-chart chart="globalAltsPieChart"></div>
+      </div>
     </div>
 
   </div>

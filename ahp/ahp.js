@@ -1,7 +1,7 @@
-var underscore = angular.module('underscore', []);
-underscore.factory('_', ['$window', function($window) {
+angular.module('underscore', [])
+.factory('_', ['$window', function($window) {
   return $window._; // assumes underscore has already been loaded on the page
-}]);
+}])
 
 var app = angular.module('ahp', ['underscore', 'googlechart']);
 
@@ -99,53 +99,11 @@ app.controller('ahpCtrl', ["$scope", "_", function($scope, _) {
   //   return outterArr
   // } // 이상동작 // https://stackoverflow.com/questions/1295584/most-efficient-way-to-create-a-zero-filled-javascript-array
 
-  function createMatix(xLength, yLength, defaultValue){
-    var outterArr = new Array( xLength );
-    for (var i=0; i<xLength; i++) {
-      var innerArr = new Array(yLength);
-      for (var j=0; j<yLength; j++) { innerArr[j] = defaultValue }
-      outterArr[i] = innerArr
-    }
-    return outterArr
-  }
 
-  function productArrays(arr1, arr2){
-    var sum = 0;
-    for(var i=0; i<arr1.length; i++) { sum += arr1[i] * arr2[i];  }
-    return sum
-  }
 
-  function multiplyMatrix( matrix1, matrix2 ){
-    var zipMatrix2 = _.unzip(matrix2)
-    var x = matrix1.length
-    var y = zipMatrix2.length
-    var rst = createMatix(x,y,0)
-    for(var i=0;i<x;i++){
-      for(var j=0;j<y;j++){
-        rst[i][j] = productArrays( matrix1[i], zipMatrix2[j] )
-      }
-    }
-    return rst
-  }
-
-  function rowSum(matrix){
-    return _.map(matrix, function(innerArr, ix, outterArr){
-      return _.reduce(innerArr, function(sum, num){ return sum + num; }, 0);
-    })
-  }
-
-  function colSum(matrix){
-    var tMx = _.unzip(matrix)
-    return rowSum(tMx)
-  }
-
-  function lowdown(arr){  // 합계가 1이 되게 비율을 낮춤
-    var sum = _.reduce(arr, function(sum, num){ return sum + num; }, 0);
-    return _.map(arr, function(e,i,arr){ return e / sum})
-  }
 
   function getJudgementMx(factor, judgementData){
-    var tmpMx = createMatix(factor.length, factor.length, 1)
+    var tmpMx = _.createMatix(factor.length, factor.length, 1)
 
     _.each(judgementData, function(e, i, arr) {
       var outterIx = factor.indexOf( e.pair[0] )
@@ -163,18 +121,18 @@ app.controller('ahpCtrl', ["$scope", "_", function($scope, _) {
 
   function calculatePV(factor, judgementData){ // priority vector
     var tmpMx = getJudgementMx(factor, judgementData)
-    var productedMx = multiplyMatrix(tmpMx, tmpMx)
-    var rst = lowdown( rowSum(productedMx) )
+    var productedMx = _.multiplyMatrix(tmpMx, tmpMx)
+    var rst = _.rate( _.sumRow(productedMx) )
     return _.zip(factor, rst)
   }
 
   function calculateLambdaMax(factor, judgementData){
     var tmpMx = getJudgementMx(factor, judgementData)
-    var productedMx = multiplyMatrix(tmpMx, tmpMx)
-    var rst = lowdown( rowSum(productedMx) )
-    var colsumArr = colSum(productedMx)
+    var productedMx = _.multiplyMatrix(tmpMx, tmpMx)
+    var rst = _.rate( _.sumRow(productedMx) )
+    var colsumArr = _.sumCol(productedMx)
     console.log(productedMx);console.log(rst);console.log(colsumArr)
-    return productArrays(rst, colsumArr)
+    return _.productArrays(rst, colsumArr)
   }
 
   function calculateIdn(factor, judgementData){  // Consistency Index
@@ -198,8 +156,10 @@ app.controller('ahpCtrl', ["$scope", "_", function($scope, _) {
 
       // report pie chart
       // var pieData = _.zip(myCris, globalCris.map(function(e,i,arr){return (e * 100).toFixed(2) } ) )
-      $scope.crisPieChart = createPieChart(['Component', '중요도'], globalCris);
+      $scope.crisPieChart = createPieChart(['Component', '중요도'], globalCris, "기준의 중요도 가중치");
       $scope.globalCris = globalCris
+
+      $scope.showAlts = true
   }
 
   $scope.reportAlts = function(){
@@ -210,8 +170,9 @@ app.controller('ahpCtrl', ["$scope", "_", function($scope, _) {
           pv: calculatePV(myAlts, $scope.jgmAlts[i].alts),
           idx: calculateIdn(myAlts, $scope.jgmAlts[i].alts)
         }
-        localAlts[i].msg = createMsg( localAlts[i].idx.cr),
-        localAlts[i].pieChart = createPieChart(['Component', '중요도'], localAlts[i].pv )
+        localAlts[i].msg = createMsg( localAlts[i].idx.cr)
+        var title = $scope.jgmAlts[i] + "가 기준일 때 선택은?"
+        localAlts[i].pieChart = createPieChart(['Component', '중요도'], localAlts[i].pv, title)
 
       }
       // console.log (localAlts)
@@ -220,7 +181,7 @@ app.controller('ahpCtrl', ["$scope", "_", function($scope, _) {
       var tmpglobalAlts = _.unzip(tmplocalAlts )
       var tmpglobalCris = _.unzip($scope.globalCris)[1]
       var globalAlts = _.map( tmpglobalAlts, function(e){
-          return productArrays( tmpglobalCris, e)
+          return _.productArrays( tmpglobalCris, e)
       })
       var globalAlts = _.zip(myAlts, globalAlts)
       console.log( tmplocalAlts )
@@ -229,7 +190,7 @@ app.controller('ahpCtrl', ["$scope", "_", function($scope, _) {
       console.log( globalAlts )
 
       $scope.localAlts = localAlts
-      $scope.globalAltsPieChart = createPieChart(['Component', '중요도'], globalAlts )
+      $scope.globalAltsPieChart = createPieChart(['Component', '중요도'], globalAlts, "당신의 최종 속마음은?" )
   }
 
   function createMsg(cr){
@@ -238,17 +199,19 @@ app.controller('ahpCtrl', ["$scope", "_", function($scope, _) {
     return tmpmsg
   }
 
-  function createPieChart(label, data){ // http://plnkr.co/edit/E4iPtQ?p=preview
+  function createPieChart(label, data, title1){ // http://plnkr.co/edit/E4iPtQ?p=preview
       var chart1 = {};
       chart1.type = "PieChart";
       chart1.data = [label].concat(data);
 
       chart1.options = {
+          title: title1,
           displayExactValues: true,
-          width: 400,
-          height: 200,
+          width: '100%',
+          height: '100%',
+          position: 'relative',
           is3D: false,
-          chartArea: {left:10,top:10,bottom:0,height:"100%"}
+          chartArea: {left:10,top:10,bottom:0,width:"100%", height: 400,}
       };
 
       chart1.formatters = {
