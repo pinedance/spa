@@ -3,9 +3,9 @@ angular.module('underscore', [])
   return $window._; // assumes underscore has already been loaded on the page
 }])
 
-var app = angular.module('ahp', ['underscore', 'googlechart']);
+var app = angular.module('ahp', ['underscore', 'ui.bootstrap', 'googlechart']);
 
-app.controller('ahpCtrl', ["$scope", "_", function($scope, _) {
+app.controller('ahpCtrl', ["$scope", "_", "$uibModal", "$log", "$location", "$anchorScroll", function($scope, _, $uibModal, $log, $location, $anchorScroll) {
 
   var myCris, myAlts //myCriterias, myAlternatives
   var pairsCris, pairsAlts // pairs
@@ -99,9 +99,6 @@ app.controller('ahpCtrl', ["$scope", "_", function($scope, _) {
   //   return outterArr
   // } // 이상동작 // https://stackoverflow.com/questions/1295584/most-efficient-way-to-create-a-zero-filled-javascript-array
 
-
-
-
   function getJudgementMx(factor, judgementData){
     var tmpMx = _.createMatix(factor.length, factor.length, 1)
 
@@ -158,9 +155,14 @@ app.controller('ahpCtrl', ["$scope", "_", function($scope, _) {
       // var pieData = _.zip(myCris, globalCris.map(function(e,i,arr){return (e * 100).toFixed(2) } ) )
       $scope.crisPieChart = createPieChart(['Component', '중요도'], globalCris, "기준의 중요도 가중치");
       $scope.globalCris = globalCris
-
+      $scope.globalCrisIdx = globalCrisIdx
       $scope.showAlts = true
-  }
+
+      setTimeout(function(){
+        $location.hash("crisPieChart");
+        $anchorScroll();
+      }, 300);
+    }
 
   $scope.reportAlts = function(){
       // alternatives
@@ -170,7 +172,8 @@ app.controller('ahpCtrl', ["$scope", "_", function($scope, _) {
           pv: calculatePV(myAlts, $scope.jgmAlts[i].alts),
           idx: calculateIdn(myAlts, $scope.jgmAlts[i].alts)
         }
-        localAlts[i].msg = createMsg( localAlts[i].idx.cr)
+        localAlts[i].cri = $scope.jgmAlts[i].cri
+        localAlts[i].msg = createMsg( localAlts[i].idx.cr )
         var title = $scope.jgmAlts[i] + "가 기준일 때 선택은?"
         localAlts[i].pieChart = createPieChart(['Component', '중요도'], localAlts[i].pv, title)
 
@@ -184,13 +187,15 @@ app.controller('ahpCtrl', ["$scope", "_", function($scope, _) {
           return _.productArrays( tmpglobalCris, e)
       })
       var globalAlts = _.zip(myAlts, globalAlts)
-      console.log( tmplocalAlts )
-      console.log( tmpglobalAlts )
-      console.log( tmpglobalCris )
-      console.log( globalAlts )
-
+      $scope.showRst = true
       $scope.localAlts = localAlts
       $scope.globalAltsPieChart = createPieChart(['Component', '중요도'], globalAlts, "당신의 최종 속마음은?" )
+
+      setTimeout(function(){
+        $location.hash("finalRst");
+        $anchorScroll();
+      }, 300);
+
   }
 
   function createMsg(cr){
@@ -223,5 +228,41 @@ app.controller('ahpCtrl', ["$scope", "_", function($scope, _) {
       console.log(chart1)
       return chart1;
   }
+
+////// modal
+    $scope.modalExplainIntensity = function (size) {
+
+      var modalInstance = $uibModal.open({
+        animation: false,
+        templateUrl: '/parts/modalExplainIntensity.html',
+        controller: 'modalExplainIntensity',
+        size: size,
+        resolve: {
+          modalData: function () {
+            return $scope.modalData;
+          }
+        }
+      });
+
+      modalInstance.result.then(function (selectedItem) {
+        $scope.modalSelected = selectedItem;
+      }, function () {
+        $log.info('Modal dismissed at: ' + new Date());
+      });
+    };
+
+//////
+
+}]);
+
+app.controller('modalExplainIntensity', ["$scope", "$uibModalInstance", "modalData", function($scope, $uibModalInstance, modalData) {
+
+  $scope.ok = function () {
+    $uibModalInstance.close();
+  };
+
+  // $scope.cancel = function () {
+  //   $uibModalInstance.dismiss('cancel');
+  // };
 
 }]);
