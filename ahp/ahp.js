@@ -234,7 +234,7 @@ app.controller('ahpCtrl', ["$scope", "_", "$uibModal", "$log", "$location", "$an
 
       var modalInstance = $uibModal.open({
         animation: false,
-        templateUrl: './parts/modalExplainIntensity.html',
+        templateUrl: 'parts/modalExplainIntensity.html',
         controller: 'modalExplainIntensity',
         size: size,
         resolve: {
