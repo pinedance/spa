@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html>
 <head>
 
@@ -177,8 +178,8 @@
 
     <div class="row" ng-repeat="localAlt in localAlts" ng-show="($index+1)===currentPage">
       <div class="col-xs-12" >
-        <p ng-class="{'text-primary': localAlt.idx.cr <= 10, 'text-danger': localAlt.idx.cr > 10}" ng-bind="crisMsg">
-          <kbd ng-bind="localAlt.cri"></kbd>
+        <p ng-class="{'text-primary': localAlt.idx.cr <= 10, 'text-danger': localAlt.idx.cr > 10}" ng-bind="localAlt.msg">
+          <!--<kbd ng-bind="localAlt.cri"></kbd>-->
         </p>
         <!-- <p ng-bind="localAlt.msg"><kbd ng-bind="localAlt.cri"></kbd></p> -->
         <div google-chart chart="localAlt.pieChart"></div>
