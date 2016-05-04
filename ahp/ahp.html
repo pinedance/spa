@@ -8,6 +8,7 @@
     <style>
       /* when showing the picture */
       .ng-hide-remove      { animation:0.5s flipInX ease; }
+      .section { padding: 0px; }
     </style>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
     <script type="text/javascript" src="https://netdna.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
@@ -32,18 +33,21 @@
 <div class="section">
   <div class="container">
     <div class="row">
-      <div class="col-md-12">
+      <div class="col-xs-12">
         <form role="form">
           <div class="form-group">
-            <label class="control-label" for="goal">Goal</label>
+            <!--Goal-->
+            <label class="control-label" for="goal">무엇을 결정하고 싶은가요?</label>
             <input class="form-control" id="goal" placeholder="Enter Your Goal" type="text" ng-model="myGoal">
           </div>
           <div class="form-group">
-            <label class="control-label" for="criterias">Criterias (seperator: ",")</label>
+            <!--Criterias(seperator: ",")-->
+            <label class="control-label" for="criterias">선택에서 무엇이 중요한가요?(콤마로 구분)</label>
             <input class="form-control" id="criterias" placeholder="Enter Your Criterias" type="text" ng-model="myCris">
           </div>
           <div class="form-group">
-            <label class="control-label" for="alternatives">Alternatives (seperator: ",")</label>
+            <!--Alternatives(seperator: ",")-->
+            <label class="control-label" for="alternatives">가능한 선택지는 무엇인가요?(콤마로 구분) </label>
             <input class="form-control" id="alternatives" placeholder="Enter Your Alternatives" type="text" ng-model="myAlts">
           </div>
           <button type="submit" class="btn btn-default" ng-click="creatWorkSheet()">Submit</button>
@@ -59,15 +63,17 @@
 <div class="section" ng-if="showCriWorkSheet">
   <div class="container">
     <div class="row">
-      <div class="col-md-12">
-        <h2>Jedge more important criterias</h2>
+      <div class="col-xs-12">
+        <!--Jedge more important criterias-->
+        <h2 class="text-center">〔기준〕</h2>
+        <h3>어떤 기준이 얼만큼 더 중요한가요?</h3>
       </div>
     </div>
   </div>
 
   <div class="container">
     <div class="row" ng-repeat="cri in jgmCris">
-      <div class="col-sm-6">
+      <div class="col-xs-6">
         <div class="btn-group">
           <button class="btn" ng-class="{'btn-warning': !(cri.moreImpFact && cri.intensity), 'btn-success': (cri.moreImpFact && cri.intensity) }"
               ng-bind="$index + 1"></button>
@@ -77,18 +83,18 @@
               ng-bind="cri.pair[1]" ng-click="judgeFactor( cri, cri.pair[1], cri.pair[0] )"></button>
         </div>
       </div>
-      <div class="col-sm-6">
+      <div class="col-xs-6">
         <div class="btn-group">
           <button type="button"  ng-repeat="int in intensitys"
               class="btn" ng-class="{'btn-default': int!==cri.intensity, 'btn-primary': int===cri.intensity }"
               ng-click="judgeIntens( cri, int )" ng-bind="int"></button>
         </div>
       </div>
-      <!-- <div class="col-md-12">
-        <div class="col-md-6">
+      <!-- <div class="col-xs-12">
+        <div class="col-xs-6">
           <pre ng-bind="cri.judgementMessage"></pre>
         </div>
-        <div class="form-group col-md-6">
+        <div class="form-group col-xs-6">
             <input class="form-control" placeholder="memo " type="text" ng-model="cri.rationale">
         </div>
       </div> -->
@@ -97,14 +103,16 @@
 
   <div class="container">
     <div class="row">
-      <div class="col-sm-12">
-        <h2>기준에 대한 결과를 확인해 보세요 <span><button class="btn btn-default" ng-click="reportCris()">Report</button></span></h2>
+      <div class="col-xs-12">
+        <h3>기준에 대한 결과 
+          <span><button class="btn btn-default" ng-click="reportCris()">확인!</button></span>
+        </h3>
         <p ng-bind="crisMsg"></p>
       </div>
     </div>
 
     <div class="row">
-      <div class="col-sm-12 text-center">
+      <div class="col-xs-12 text-center">
         <!-- <div google-chart chart="crisPieChart" style="border:1px inset black;padding:0;width:400px"></div> -->
         <!-- <div google-chart chart="crisPieChart" style="height:600px; width:100%;"></div> -->
         <div google-chart chart="crisPieChart" style=""></div>
@@ -123,15 +131,13 @@
   <div class="container" >
 
     <div class="row" >
-      <div class="col-md-12 text-center ">
-        <h2>Alternatives
-          <small ng-bind="'by '+jgmAlt.cri"></small>
-        </h2>
+      <div class="col-xs-12 text-center ">
+        <h3 ng-bind="'〔'+jgmAlt.cri+'〕에 대한 선택은?'"></h3>
       </div>
     </div>
 
     <div class="row" ng-repeat="alt in jgmAlt.alts">
-      <div class="col-sm-6">
+      <div class="col-xs-6">
             <div class="btn-group">
               <button class="btn" ng-class="{'btn-warning': !(alt.moreImpFact && alt.intensity), 'btn-success': (alt.moreImpFact && alt.intensity) }"
                   ng-bind="$index + 1"></button>
@@ -141,7 +147,7 @@
                   ng-bind="alt.pair[1]" ng-click="judgeFactor( alt, alt.pair[1], alt.pair[0] )"></button>
             </div>
       </div>
-      <div class="col-sm-6">
+      <div class="col-xs-6">
             <div class="btn-group">
               <button type="button" ng-repeat="int in intensitys"
                   class="btn" ng-class="{'btn-default': int!==alt.intensity, 'btn-primary': int===alt.intensity }"
@@ -157,7 +163,7 @@
 <div class="section " ng-if="showAlts">
   <div class="container ">
     <div class="row text-center ">
-      <div class="col-md-12 ">
+      <div class="col-xs-12 ">
 
         <ul class="pagination ">
           <li>
@@ -174,25 +180,25 @@
     </div>
 
     <div class="row">
-      <div class="col-md-12">
-        <h2>최종 결과를 확인해 보세요
+      <div class="col-xs-12">
+        <h3>최종 결과
            <span>
-             <button class="btn btn-default" ng-click="reportAlts()">Report</button>
+             <button class="btn btn-default" ng-click="reportAlts()">확인!</button>
            </span>
-         </h2>
+         </h3>
       </div>
     </div>
 
     <div class="row" ng-repeat="localAlt in localAlts">
-      <div class="col-md-12" >
+      <div class="col-xs-12" >
         <p ng-bind="localAlt.msg"></p>
         <div google-chart chart="localAlt.pieChart"></div>
       </div>
     </div>
 
     <div class="row">
-      <div class="col-md-12" >
-        <p>최후의 속마음은?</p>
+      <div class="col-xs-12" >
+        <h3>최후의 속마음은?</h3>
         <div google-chart chart="globalAltsPieChart"></div>
       </div>
     </div>
@@ -200,6 +206,6 @@
   </div>
 </div>
 
-<div ng-include="'parts/footer.html'"></div>
+<!--<div ng-include="'parts/footer.html'"></div>-->
 </body>
 </html>
