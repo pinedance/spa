@@ -1,5 +1,9 @@
 var app = angular.module('gofangApp', ['ngTagsInput']);
 
+app.config(['$compileProvider', function ($compileProvider) {
+  $compileProvider.debugInfoEnabled(false);
+}]);  // https://medium.com/swlh/improving-angular-performance-with-1-line-of-code-a1fb814a6476#.afzq4lagg
+
 app.service('copyright', function(){
 	this.year = function(startYear){
 		var thisYear = new Date().getFullYear();
@@ -73,6 +77,7 @@ app.controller('FormulaCtrl', ['$scope', '$q', 'loadSrc', 'copyright', function(
 
 			$scope.results = handler;
 		}
+		delete $scope.fmlIdx
 	};
 	
 	$scope.findHerbsymp = function(){
@@ -94,14 +99,17 @@ app.controller('FormulaCtrl', ['$scope', '$q', 'loadSrc', 'copyright', function(
 		$scope.find()
 	};
 	
-	$scope.showDetail = function(formula){ 
+	$scope.showDetail = function(formula, index){ 
 		$scope.detail = data.formulas[formula];
 		$scope.herbdetails = Object.keys(data.formulas[formula].ingOrg);
 		$scope.yack = "약징 내용";
+		$scope.fmlIdx = index
+		delete $scope.yackIdx
 	};
 	
-	$scope.showHerbDetail = function(h){
+	$scope.showHerbDetail = function(h, index){
 		$scope.yack = data.herbs[h].txYG;
+		$scope.yackIdx = index
 	};
 	
 	$scope.resetForms = function(){
