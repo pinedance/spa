@@ -5,76 +5,55 @@ angular.module('underscore', [])
 
 var app = angular.module('ahp', ['underscore', 'ui.bootstrap', 'googlechart']);
 
+app.config(['$compileProvider', function ($compileProvider) {
+  $compileProvider.debugInfoEnabled(false);
+}]);
+
 app.controller('ahpCtrl', ["$scope", "_", "$uibModal", "$log", "$location", "$anchorScroll", function($scope, _, $uibModal, $log, $location, $anchorScroll) {
 
   var myCris, myAlts //myCriterias, myAlternatives
   var pairsCris, pairsAlts // pairs
   var createJugementSpace = function(x){
-    return {'pair': x, 'moreImpFact': "", 'lessImpFact': "", 'intensity': 0, 'rationale': "", 'judgementMessage': "  "}
+    return {'pair': x, 'moreImpFact': "", 'lessImpFact': "", 'intensity': 0, 'rationale': "", 'judgementMessage': "  ", 'decided': false}
   }  // more inportant factor
   var randomConsistencyIndex = [0,0,0,0.58,0.9,1.12,1.24,1.32,1.41,1.45,1.49]
   $scope.intensitys = [1,3,5,7,9]
-  $scope.myGoal = "점심에 뭘 먹을까?"//"Choose the best car for the family"
-  $scope.myCris = "맛,값,거리"//"Cost, Safety, Style" // "Cost, Safety, Style, Capacity"
-  $scope.myAlts = "짜장면,국밥,돈까스,백반"//"Accord Sedan, Pilot SUV, CR-V SUV, Odyssey Minivan" // "Accord Sedan, Accord Hybrid Sedan, Pilot SUV, CR-V SUV, Element SUV, Odyssey Minivan"
+  $scope.myGoal = "점심에 뭘 먹을까?"        //"Choose the best car for the family"
+  $scope.myCris = "맛,값,거리"              //"Cost, Safety, Style" // "Cost, Safety, Style, Capacity"
+  $scope.myAlts = "짜장면,국밥,돈까스"  //"Accord Sedan, Pilot SUV, CR-V SUV, Odyssey Minivan" // "Accord Sedan, Accord Hybrid Sedan, Pilot SUV, CR-V SUV, Element SUV, Odyssey Minivan"
 
   $scope.creatWorkSheet = function(){
     console.log( $scope.myGoal )
     myCris = _.uniq( _.compact( $scope.myCris.split(/\s*,\s*/) ) )
     myAlts = _.uniq( _.compact( $scope.myAlts.split(/\s*,\s*/) ) )
-    console.log(myCris)
+
     // criterias
-    pairsCris = selectPair( myCris )  // create pairs for Pairwise comparing, Array
+    pairsCris = _.selectPair( myCris )  // create pairs for Pairwise comparing, Array
     $scope.jgmCris = _.map(pairsCris, createJugementSpace ) // create judgement space, Array
 
     // alternatives
-    pairsAlts = selectPair( myAlts )  // create pairs for Pairwise comparing
+    pairsAlts = _.selectPair( myAlts )  // create pairs for Pairwise comparing
     $scope.jgmAlts = _.map(myCris, function(c){
       return {'cri': c, 'alts': _.map(pairsAlts, createJugementSpace ) }
     })
 
-    console.log($scope.jgmAlts)
     $scope.cris = myCris
     $scope.showCriWorkSheet = true
-    $scope.showAltWorkSheet = true
     $scope.currentPage = 1
-  }
-
-  function selectPair(arr){
-    if(arr.length < 3 ){ return [arr] }
-    var first = _.first(arr)
-    var rest = _.rest(arr)
-    var newElem = _.map(rest, function(x){
-      return [first].concat(x)
-    })
-    var rst = newElem.concat( selectPair( rest ) )
-          console.log( rst )
-    return rst
   }
 
   $scope.judgeFactor = function( factor, myMoreImpFact, myLessImpFact ){
     factor.moreImpFact = myMoreImpFact
     factor.lessImpFact = myLessImpFact
     createJudgementMessage( factor )
+    factor.decided = (factor.intensity)? true : false
   } //( cri, cri.pair[1] )
 
   $scope.judgeIntens = function( factor, myIntensity ){
     factor.intensity = myIntensity
     createJudgementMessage( factor )
+    factor.decided = (factor.moreImpFact)? true : false
   }
-
-  // $scope.judgeAlts = function( pix, ix, myMoreImpFact, myLessImpFact ){
-  //   var factor = $scope.jgmAlts[pix].alts[ix]
-  //   factor.moreImpFact = myMoreImpFact
-  //   factor.lessImpFact = myLessImpFact
-  //   createJudgementMessage( factor )
-  // }
-  //
-  // $scope.judgeAltsIntens = function( pix, ix, myIntensity ){
-  //   var factor = $scope.jgmAlts[pix].alts[ix]
-  //   factor.intensity = myIntensity
-  //   createJudgementMessage( factor )
-  // }
 
   function createJudgementMessage( cri ){
     if( cri.moreImpFact === "" || cri.intensity === 0 ){ return }
@@ -89,15 +68,7 @@ app.controller('ahpCtrl', ["$scope", "_", "$uibModal", "$log", "$location", "$an
     } else {
       $scope.currentPage = direction
     }
-    console.log ('currentPage'); console.log( $scope.currentPage)
   }
-
-  // n x m 행렬 만들고, 1 채워 넣기
-  // function createMatix(xLength, yLength, defaultValue){
-  //   (innerArr = []).length = yLength; innerArr.fill( defaultValue );
-  //   (outterArr = []).length = xLength; outterArr.fill( _.clone(innerArr) );
-  //   return outterArr
-  // } // 이상동작 // https://stackoverflow.com/questions/1295584/most-efficient-way-to-create-a-zero-filled-javascript-array
 
   function getJudgementMx(factor, judgementData){
     var tmpMx = _.createMatix(factor.length, factor.length, 1)
@@ -128,7 +99,6 @@ app.controller('ahpCtrl', ["$scope", "_", "$uibModal", "$log", "$location", "$an
     var productedMx = _.multiplyMatrix(tmpMx, tmpMx)
     var rst = _.rate( _.sumRow(productedMx) )
     var colsumArr = _.sumCol(productedMx)
-    console.log(productedMx);console.log(rst);console.log(colsumArr)
     return _.productArrays(rst, colsumArr)
   }
 
@@ -140,11 +110,21 @@ app.controller('ahpCtrl', ["$scope", "_", "$uibModal", "$log", "$location", "$an
     return { "lambdaMax": lambdaMax, "ci": ci, "cr": cr }
   }
 
+  function allDecided( arr ){
+    var decided = _.map( arr, function(e){ return ( (e.decided)? 1 : 0 ) } )
+    var multiply = _.reduce(decided, function(memo, num){ return memo * num; }, 1)
+    return ( (multiply===0)? false : true )
+  }
+
   $scope.reportCris = function(){
-      // calculate criterias
+
+      if( !allDecided($scope.jgmCris) ){
+        alert (" 선택하지 않은 문항이 있습니다. ");
+        return
+      }
+
       var globalCris = calculatePV(myCris, $scope.jgmCris)
       var globalCrisIdx = calculateIdn(myCris, $scope.jgmCris)
-      console.log( globalCris); console.log( globalCrisIdx)
 
       // report message
       var tmpmsg = ( globalCrisIdx.cr <= 10)? "일관된 기준을 가지셨군요!!!" : "마음을 정리하고 다시 해보시는게 좋겠어요"
@@ -153,7 +133,10 @@ app.controller('ahpCtrl', ["$scope", "_", "$uibModal", "$log", "$location", "$an
 
       // report pie chart
       // var pieData = _.zip(myCris, globalCris.map(function(e,i,arr){return (e * 100).toFixed(2) } ) )
-      $scope.crisPieChart = createPieChart(['Component', '중요도'], globalCris, "기준의 중요도 가중치");
+      var tmpCrisPieChart = createPieChart(['Component', '중요도'], globalCris, "기준의 중요도 가중치");
+      tmpCrisPieChart.options.pieHole = 0.3
+      $scope.crisPieChart = tmpCrisPieChart
+
       $scope.globalCris = globalCris
       $scope.globalCrisIdx = globalCrisIdx
       $scope.showAlts = true
@@ -168,13 +151,19 @@ app.controller('ahpCtrl', ["$scope", "_", "$uibModal", "$log", "$location", "$an
       // alternatives
       var localAlts = []
       for(var i=0;i<$scope.jgmAlts.length;i++){
+
+        if( !allDecided( $scope.jgmAlts[i].alts ) ){
+          alert (" 선택하지 않은 문항이 있습니다. ");
+          return
+        }
+
         localAlts[i] = {
           pv: calculatePV(myAlts, $scope.jgmAlts[i].alts),
           idx: calculateIdn(myAlts, $scope.jgmAlts[i].alts)
         }
         localAlts[i].cri = $scope.jgmAlts[i].cri
         localAlts[i].msg = createMsg( localAlts[i].idx.cr )
-        var title = $scope.jgmAlts[i] + "가 기준일 때 선택은?"
+        var title = $scope.jgmAlts[i].cri + "가 기준일 때 선택은?"
         localAlts[i].pieChart = createPieChart(['Component', '중요도'], localAlts[i].pv, title)
 
       }
@@ -189,7 +178,9 @@ app.controller('ahpCtrl', ["$scope", "_", "$uibModal", "$log", "$location", "$an
       var globalAlts = _.zip(myAlts, globalAlts)
       $scope.showRst = true
       $scope.localAlts = localAlts
-      $scope.globalAltsPieChart = createPieChart(['Component', '중요도'], globalAlts, "당신의 최종 속마음은?" )
+      var tmpGlobalAltsPieChart = createPieChart(['Component', '중요도'], globalAlts, "당신의 최종 속마음은?" )
+      tmpGlobalAltsPieChart.options.is3D = true
+      $scope.globalAltsPieChart = tmpGlobalAltsPieChart
 
       setTimeout(function(){
         $location.hash("finalRst");
@@ -210,13 +201,13 @@ app.controller('ahpCtrl', ["$scope", "_", "$uibModal", "$log", "$location", "$an
       chart1.data = [label].concat(data);
 
       chart1.options = {
-          title: title1,
+          // title: title1,
           displayExactValues: true,
-          width: '100%',
-          height: '100%',
+          height: 300,
           position: 'relative',
           is3D: false,
-          chartArea: {left:10,top:10,bottom:0,width:"100%", height: 400,}
+          // chartArea: {left:10,top:10,width:"100%", height: 600},
+          chartArea: {left:'25%',top:0,width:'100%',height:'100%'}
       };
 
       chart1.formatters = {
@@ -225,7 +216,6 @@ app.controller('ahpCtrl', ["$scope", "_", "$uibModal", "$log", "$location", "$an
           pattern: "#,##0.00 %"
         }]
       };
-      console.log(chart1)
       return chart1;
   }
 

@@ -7,6 +7,16 @@ _.productArrays = function(arr1, arr2){
   return sum
 }
 
+_.selectPair = function(arr){           // ['a', 'b', 'c']  ==> [['a','b'], ['a','c'], ['b','c']]
+  if(arr.length < 3 ){ return [arr] }
+  var first = _.first(arr)
+  var rest = _.rest(arr)
+  var newElem = _.map(rest, function(x){
+    return [first].concat(x)
+  })
+  var rst = newElem.concat( _.selectPair( rest ) )
+  return rst
+}
 
 // calcurate matrix
 _.createMatix = function(xLength, yLength, defaultValue){
