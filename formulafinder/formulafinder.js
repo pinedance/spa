@@ -33,6 +33,7 @@ app.controller('FormulaCtrl', ['$scope', '$q', 'loadSrc', 'copyright', function(
 			formulas: Object.keys(d.formulas), 
 			symptoms: Object.keys(d.symptoms)
 		}
+		$scope.gotData = true
 	})
 
 	$scope.loadItems = function(query, mykey) {
@@ -95,7 +96,7 @@ app.controller('FormulaCtrl', ['$scope', '$q', 'loadSrc', 'copyright', function(
 	
 	$scope.showDetail = function(formula){ 
 		$scope.detail = data.formulas[formula];
-		$scope.herbdetails = Object.keys(data.formulas[formula].ing);
+		$scope.herbdetails = Object.keys(data.formulas[formula].ingOrg);
 		$scope.yack = "약징 내용";
 	};
 	

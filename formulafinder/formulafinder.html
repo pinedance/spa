@@ -21,7 +21,7 @@
                         <img src="http://livedoor.blogimg.jp/bakusei/imgs/c/a/cacbdc7e.jpg" alt="" width="160px" class="pull-right img-responsive img-rounded">
                     </div>
                 </div>
-				<div class="row">
+				<div class="row" ng-show="gotData">
 					<div class="col-sm-6">
 						<tags-input ng-model="inHerbs" placeholder="포함하는 본초" min-length=1 display-property="herbs" on-tag-added="find()" on-tag-removed="find()">
 							<auto-complete source="loadItems($query, 'herbs')" min-length=1 debounce-delay=50></auto-complete>
