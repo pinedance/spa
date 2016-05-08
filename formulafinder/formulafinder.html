@@ -48,6 +48,7 @@
 				<div class="well" id="formulaDetail">
 					<p ng-bind="'처방명 : ' + detail.txName"></p>
 					<p ng-bind="'방극 : ' + detail.txFangi"><p>
+					<p ng-bind="'방극산정 : ' + detail.txFangiExt"><p>
 					<p ng-bind="'구성 : ' + detail.txGoo"><p>
 					<button type="button" class="btn btn-default" ng-repeat="h in herbdetails" ng-class="{'btn-info': $index===yackIdx}" ng-click="showHerbDetail(h, $index)" ng-bind="h"></button>
 					<blockquote><p ng-bind="yack"></p></blockquote>

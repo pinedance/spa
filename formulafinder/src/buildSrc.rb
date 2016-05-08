@@ -1,8 +1,20 @@
 require 'json'
 
+Encoding.default_external = 'utf-8'
+
 $gherbs = Array.new
 $gherbs_dose = Array.new
 formulas = Hash.new
+
+class String
+	def del_comment( comment_delimiter="#" )
+	    self.gsub(/#{comment_delimiter}.*$/, '')
+	end
+	
+	def del_emptyline( line_delimiter = "\r?\n" )
+	    self.gsub(/^\s*$#{line_delimiter}/, '')
+	end
+end
 
 def parseIng(arr)
 	if arr.strip == "-"
@@ -53,27 +65,51 @@ end
 
 #====
 
-$chageSrc = File.open("data/herbSynonym.tsv").read.split(/\r?\n/).map do |x|
+def read_preprocess(filename, option={remove_emptyline: true})
+	rst = File.open(filename, 'r').read.del_comment()
+	( option[:remove_emptyline] )? rst.del_emptyline() : rst
+end
+
+# get herb data
+
+$chageSrc = read_preprocess("data/herbSynonym.tsv").split(/\r?\n/).map do |x|
 	_x = x.split("\t")
-	
 	[/^(#{_x[0].strip})$/, _x[1].strip]
 end
 
-data = File.open("data/data.tsv", 'r').read.gsub("﻿", "").split("\n\n").each_with_index do | pg, i | 
-	_pgs = pg.split(/\r?\n/)
-	txNameKr, txName = _pgs[1].split(";").map(&:strip)
+# get formula data
+
+read_preprocess("data/formulaName.tsv").split(/\r?\n/).each_with_index do | line, i |
+	datas = line.split(/\t/)
+	txNameKr = datas[1].strip		# 한글 명칭
 	rst = {
 		:id => i,
-		:no => _pgs[0].strip,
-		:txName => txName,
-		:txFangi => _pgs[2].strip,
-		:txGoo => _pgs[3].strip,
-		:ingOrg => parseIng( _pgs[4].strip )
+		:no => datas[0].strip,
+		:txName => datas[2].strip,  # 한자 명칭
 	}
-	rst[:ing] = addSynonym( rst[:ingOrg] )
-	formulas[txNameKr.to_sym] = rst
-	
+	formulas[ txNameKr.to_sym ] = rst
 end
+
+dataFiles = [['data/fangJi.tsv', [:txFangi]], ['data/fangJiExt.tsv', [:txFangiExt]]]	#tsv
+
+dataFiles.each do |f, colNames|
+	read_preprocess(f).split(/\r?\n/).each_with_index do | line, i |
+		datas = line.split(/\t/).map(&:strip)
+		colNames.each_with_index do | colname, j |
+			formulas[ datas[1].to_sym ][ colname ] = datas[ j+2 ] 
+		end
+	end
+end
+
+read_preprocess("data/formulaDose.tsv", {remove_emptyline: false}).split(/\r?\n\r?\n/).each_with_index do | pg, i | 
+	_pgs = pg.split(/\r?\n/)
+	key = _pgs[1].strip
+	formulas[ key.to_sym ][:txGoo] = _pgs[2].strip
+	formulas[ key.to_sym ][:ingOrg] = parseIng( _pgs[3].strip )
+	formulas[ key.to_sym ][:ing] = addSynonym( formulas[ key.to_sym ][:ingOrg] )
+end
+
+####
 
 $gherbs.uniq!
 $gherbs_dose.uniq!
