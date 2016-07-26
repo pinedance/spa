@@ -31,6 +31,9 @@
 						</tags-input>
 					</div>
 					<div class="col-sm-6">
+						<tags-input ng-model="formulaName" placeholder="찾는 처방이름" min-length=2 display-property="formulas" on-tag-added="findFormula()" on-tag-removed="findFormula()">
+							<auto-complete source="loadItems($query, 'formulas')" min-length=1 debounce-delay=50></auto-complete>
+						</tags-input>
 						<tags-input ng-model="inSymp" placeholder="찾는 증상" min-length=1 display-property="symptoms" on-tag-added="findHerbsymp()" on-tag-removed="findHerbsymp()">
 							<auto-complete source="loadItems($query, 'symptoms')" min-length=1 debounce-delay=50></auto-complete>
 						</tags-input>

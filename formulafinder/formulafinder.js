@@ -52,31 +52,28 @@ app.controller('FormulaCtrl', ['$scope', '$q', 'loadSrc', 'copyright', function(
 	};  // solution : http://stackoverflow.com/questions/23069562/autocomplete-using-ngtagsinput-cannot-read-property-then-of-undefined 
 	
 	$scope.find = function(){
-		var tmp_in = $scope.inHerbs.map(function(item) { return item.herbs });
-		var tmp_out = $scope.outHerbs.map(function(item) { return item.herbs });
+		let tmp_in = $scope.inHerbs.map(function(item) { return item.herbs });
+		let tmp_out = $scope.outHerbs.map(function(item) { return item.herbs });
 		
-		if ( (tmp_in.length + tmp_out.length)==0 ){
-			$scope.results = [];
-		} else {
-			var handler = Object.keys(data.formulas);
-		
-			for (var i=0; i < tmp_in.length ; i++){ 
-				if (data.herbs[tmp_in[i]]){
-					handler = handler.intersection( data.herbs[tmp_in[i]].link );
-				} else {
-					continue;
-				}
-			}
-			for (var j=0; j < tmp_out.length ; j++){
-				if (data.herbs[tmp_out[j]]){
-					handler = handler.diff( data.herbs[tmp_out[j]].link );
-				} else {
-					continue;
-				}
-			}
+		if ( (tmp_in.length + tmp_out.length)!==0 ){ $scope.results = []; return; }
 
-			$scope.results = handler;
+		let handler = Object.keys(data.formulas);
+	
+		for (var i=0; i < tmp_in.length ; i++){ 
+			if ( data.herbs[tmp_in[i]] ){
+				handler = handler.intersection( data.herbs[tmp_in[i]].link );
+			} else {
+				$scope.results = []; return;
+			}
 		}
+		for (var j=0; j < tmp_out.length ; j++){
+			if (data.herbs[tmp_out[j]]){
+				handler = handler.diff( data.herbs[tmp_out[j]].link );
+			} else {
+				continue;
+			}
+		}
+		$scope.results = handler;
 		delete $scope.fmlIdx
 	};
 	
@@ -89,7 +86,13 @@ app.controller('FormulaCtrl', ['$scope', '$q', 'loadSrc', 'copyright', function(
 		}
 		$scope.symptoms = _output.map(function(item){ return item.org })
 		$scope.herbssymptoms = _outHerbArr
+	};
 
+	$scope.findFormula = function(){
+		console.log($scope.formulaName)
+		var _output = $scope.formulaName.map(function(item) { return item.formulas });
+		let handler = Object.keys(data.formulas);
+		$scope.resultes = _output.filter(function(item){ return handler.indexOf(item) > -1})
 	};
 
 	$scope.addHerb = function(hb){
