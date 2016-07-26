@@ -83,11 +83,13 @@ app.controller('FormulaCtrl', ['$scope', '$q', 'loadSrc', 'copyright', function(
 				continue;
 			}
 		}
-    if( tmp_formula && (tmp_formula.length > 0) ){
+
+    if( $scope.formulaName && $scope.formulaName.length > 0){
         $scope.results = handler.intersection( tmp_formula )
     } else {
-		    $scope.results = handler;
+        $scope.results = handler;
     }
+
 		delete $scope.fmlIdx
 	};
 
@@ -125,6 +127,7 @@ app.controller('FormulaCtrl', ['$scope', '$q', 'loadSrc', 'copyright', function(
 	$scope.resetForms = function(){
 		delete $scope.inHerbs;
 		delete $scope.outHerbs;
+		delete $scope.formulaName;
 		delete $scope.results;
 
 		delete $scope.detail;
