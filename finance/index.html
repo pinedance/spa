@@ -2,7 +2,7 @@
 
 	<head>
 		<meta charset="utf-8">
-		<title>DB status</title>
+		<title>Finance Abstract</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<link href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
 		<link href="//pingendo.github.io/pingendo-bootstrap/themes/default/bootstrap.css" rel="stylesheet" type="text/css">
@@ -27,8 +27,10 @@
 
 		<div class="row">
 			<div class="col-md-12">
-				<h2 class="form-inline">장단기 금리차 (최근
-					<input type="text" class=" form-control" style="width: 40px" ng-model="monthlength" ng-change="updatemonthlength()">
+				<h2 class="form-inline">
+					<i class="fa fa-refresh fa-fw" ng-class="{'fa-spin': spin}"></i>
+				장단기 금리차 (최근
+					<input type="text" class="form-control" style="width:40px; text-align:center" ng-model="monthlength" ng-change="updatemonthlength()">
 				개월)
 					<button type="button" class="btn btn-default" ng-class="{active: longEnd==5}" ng-click="updatelongEnd(5)">국채5년</button>
 					<button type="button" class="btn btn-default" ng-class="{active: longEnd==3}" ng-click="updatelongEnd(3)">국채3년</button>

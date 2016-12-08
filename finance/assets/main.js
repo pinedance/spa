@@ -8,9 +8,14 @@ angular.module("finance", ["chart.js", "ngSanitize", "dthree"])
 
 .constant("api", {
 		rooturl: "http://myapibox.herokuapp.com/api/finance/",
-		conf : {}
-		}
-)
+		conf : {
+			headers : {
+				// "Content-Type": "application/json;charset=utf-8"
+                "Content-Type": "application/json"
+			},
+            data: "" // 이게 없으면 Content-Type이 설정되지 않음 //
+			}
+})
 
 .controller("interestSpreadCtrl", function ($scope, $http, api, d3) {
 
@@ -60,7 +65,7 @@ angular.module("finance", ["chart.js", "ngSanitize", "dthree"])
 		$scope.seriesMonthly = ['Long', 'Short', 'Diff'];
 		$scope.dataMonthly = [it_long, it_short, it_diff]
 		$scope.labelsMonthly = it_date
-
+		$scope.spin = false
 	}
 
 	function urlLine( monthago ){
@@ -68,6 +73,7 @@ angular.module("finance", ["chart.js", "ngSanitize", "dthree"])
 	}
 
 	function reBuild(){
+		$scope.spin = true
 		$http.get(urlLine( $scope.monthlength ), api.conf).then( line.success, fail )
 	}
 
