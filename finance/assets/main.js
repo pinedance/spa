@@ -39,6 +39,7 @@ angular.module("finance", ["chart.js", "ngSanitize", "dthree"])
 	var line = {}
 
 	function fail(res){
+		$scope.spin = false
 		console.log( res.error )
 	}
 
@@ -61,8 +62,8 @@ angular.module("finance", ["chart.js", "ngSanitize", "dthree"])
 		var it_date = _data.map(function(e){
 			return e.date
 		})
-
-		$scope.seriesMonthly = ['Long', 'Short', 'Diff'];
+		var longLegend = ($scope.longEnd==3)? "국채(3년)" : "국채(5년)"
+		$scope.seriesMonthly = [longLegend, 'CD(91일)', 'Diff'];
 		$scope.dataMonthly = [it_long, it_short, it_diff]
 		$scope.labelsMonthly = it_date
 		$scope.spin = false
