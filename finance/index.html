@@ -1,0 +1,88 @@
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>DB status</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+		<link href="//pingendo.github.io/pingendo-bootstrap/themes/default/bootstrap.css" rel="stylesheet" type="text/css">
+		<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+	</head>
+	
+<link rel="stylesheet" href="/assets/css/angular-chart.min.css">
+<link rel="stylesheet" href="//fonts.googleapis.com/earlyaccess/jejuhallasan.css">
+
+<body>
+	
+<div class="section" ng-app="DBStatus">
+	<div class="container" ng-controller="ChartCtrl">
+		<div class="row">
+			<div class="col-md-12 text-center"
+				style="background-image: url(/assets/image/cropped-header_background3.png); color: white">
+			<br>
+			<h1 style="font-family: 'Jeju Hallasan'">한의학고전DB STATUS at a glance</h1>
+			<br>
+			</div>
+		</div>
+		
+		<div class="row">
+			<div class="col-md-12">
+
+				<h2><a href="https://mediclassics.kr" target="_blank">한의학고전DB</a>  Visitor Sessions</h2>
+				<p>세션 카운트 기준 : 동일 접속자의 경우 30분 내 복수의 방문은 1회, 30분 이후 방문은 신규 1회 </p>
+				<label class="radio-inline"><input type="radio" ng-model="enddate" ng-value="lastday" ng-change="reBuild()">현재까지</label>
+				<label class="radio-inline"><input type="radio" ng-model="enddate" value="lastMonth" ng-change="reBuild()">지난 달까지</label>
+
+				<h3>Last 1 Year (monthly) <buttom class="btn btn-info" ng-click="dnChart('lineMonthly')">download</buttom></h3>
+				<ul class="list-inline">
+  					<li>해당기간 총세션 : {{ yearly.total }}</li>
+  					<li>해당기간 월평균세션 : {{ yearly.meanbymonth }}</li>
+  					<li>해당기간 일평균세션 : {{ yearly.meanbyday }}</li>
+				</ul>
+				<canvas id="lineMonthly" class="chart chart-line" chart-data="dataMonthly"
+				  chart-labels="labelsMonthly" chart-legend="true" chart-series="seriesMonthly"
+				  chart-click="onClick" >
+				</canvas> 
+
+				<h3>Last 1 Month (daily) <buttom class="btn btn-info" ng-click="dnChart('lineDaily')">download</buttom></h3>
+				<ul class="list-inline">
+  					<li>해당기간 총세션 : {{ monthly.total }}</li>
+  					<li>해당기간 일평균세션 : {{ monthly.meanbyday }}</li>
+				</ul>
+				<canvas id="lineDaily" class="chart chart-line" chart-data="dataDaily"
+				  chart-labels="labelsDaily" chart-legend="true" chart-series="seriesDaily"
+				  chart-click="onClick" >
+				</canvas> 
+			</div>
+		</div>
+		<hr>
+		<div class="row">
+			<div class="col-md-12">
+				<h2><a href="https://mediclassics.kr" target="_blank">한의학고전DB</a>  Charactor size (Hanzi only) <buttom class="btn btn-info" ng-click="dnChart('doughnutChrCount')">download</buttom></h2>
+				<p>{{ count.books }} 종 {{ count.chrs }} 자</p>
+				<canvas id="doughnutChrCount" class="chart chart-doughnut"
+				  chart-data="dataChrCount" chart-labels="labelsChrCount" chart-legend="true">
+				</canvas> 
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-12 text-middle" id="word-cloud">
+			</div>
+		</div>
+	</div>
+</div>
+
+<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.5.0/angular.min.js"></script>
+<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.5.0/angular-sanitize.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/Chart.js/1.0.2/Chart.min.js"></script>
+<script src="assets/javascript/angular-chart.min.js"></script>
+<script src="//cdn.rawgit.com/pinedance/f53dd1b0402c4574467c/raw/fe0bad830381fcd7aea7c8b959384fe800f12529/prototype.js"></script>
+
+<script type="text/javascript" src="//d3js.org/d3.v3.min.js"></script>
+<script type="text/javascript" src="//rawgit.com/jasondavies/d3-cloud/master/build/d3.layout.cloud.js"></script>
+
+<script src="assets/javascript/db.status.js"></script>
+
+
+</body>
+</html>
