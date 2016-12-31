@@ -1,0 +1,22 @@
+<div class="container">
+	<div class="row">
+		<div class="col-md-12">
+			
+			<h2 class="form-inline">
+				<i class="fa fa-refresh fa-fw" ng-class="{'fa-spin': spin}"></i>
+			경기선행지수 : 장단기 금리차 (최근
+				<input type="text" class="form-control" style="width:40px; text-align:center" ng-model="monthlength" ng-change="updatemonthlength()">
+			개월)
+				<button type="button" class="btn btn-default" ng-class="{active: longEnd==5}" ng-click="updatelongEnd(5)">국채5년</button>
+				<button type="button" class="btn btn-default" ng-class="{active: longEnd==3}" ng-click="updatelongEnd(3)">국채3년</button>
+			</h2>
+			<br>
+			<canvas id="lineMonthly" class="chart chart-line" chart-data="dataMonthly"
+			  chart-labels="labelsMonthly" chart-legend="true" chart-series="seriesMonthly" chart-colors="linecolor"
+			  chart-click="onClick" >
+			</canvas>
+
+		</div>
+	</div>
+
+</div>
