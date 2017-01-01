@@ -28,9 +28,10 @@ angular.module("finance")
         templateUrl : "views/currencyExchangeRates.html",
 		controller : "currencyExchangeRatesCtrl"
     })
-    // .when("/red", {
-    //     templateUrl : "red.htm"
-    // })
+    .when("/economy-leading-index", {
+		templateUrl : "views/economyLeadingIndex.html",
+		controller : "economyLeadingIndexCtrl"
+    })
 	.otherwise({
     	redirectTo : '/interest-spread'
   });
