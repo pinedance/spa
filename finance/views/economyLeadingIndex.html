@@ -1,0 +1,18 @@
+<div class="container">
+	<div class="row">
+		<div class="col-md-12">
+
+			<h2 class="form-inline">
+				<i class="fa fa-refresh fa-fw" ng-class="{'fa-spin': spin}"></i>
+			경기종합지수 <small>(선행지수, 60개월)</small>
+			</h2>
+			<br>
+			<canvas id="lineMonthly" class="chart chart-line" chart-data="dataMonthly"
+			  chart-labels="labelsMonthly" chart-legend="true" chart-series="seriesMonthly" chart-colors="linecolor"
+			  chart-click="onClick" >
+			</canvas>
+
+		</div>
+	</div>
+
+</div>

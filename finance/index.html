@@ -12,43 +12,30 @@
 <link rel="stylesheet" href="assets/angular-chart.min.css">
 <link rel="stylesheet" href="//fonts.googleapis.com/earlyaccess/jejuhallasan.css">
 
-<body>
+<body ng-app="finance">
 
-<div class="section" ng-app="finance">
-	<div class="container" ng-controller="interestSpreadCtrl">
+<div class="section" >
+
+	<div class="container">
 		<div class="row">
+			<a href="#/">
 			<div class="col-md-12 text-center"
 				style="background-image: url(assets/cropped-header_background3.png); color: white">
 			<br>
 			<h1>FINANCE STATUS at a glance</h1>
 			<br>
 			</div>
+			</a>
 		</div>
-
-		<div class="row">
-			<div class="col-md-12">
-				<h2 class="form-inline">
-					<i class="fa fa-refresh fa-fw" ng-class="{'fa-spin': spin}"></i>
-				장단기 금리차 (최근
-					<input type="text" class="form-control" style="width:40px; text-align:center" ng-model="monthlength" ng-change="updatemonthlength()">
-				개월)
-					<button type="button" class="btn btn-default" ng-class="{active: longEnd==5}" ng-click="updatelongEnd(5)">국채5년</button>
-					<button type="button" class="btn btn-default" ng-class="{active: longEnd==3}" ng-click="updatelongEnd(3)">국채3년</button>
-				</h2>
-				<br>
-				<canvas id="lineMonthly" class="chart chart-line" chart-data="dataMonthly"
-				  chart-labels="labelsMonthly" chart-legend="true" chart-series="seriesMonthly" chart-colors="linecolor"
-				  chart-click="onClick" >
-				</canvas>
-
-			</div>
-		</div>
-
 	</div>
+
+	<div ng-view></div>
+
 </div>
 
-<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.5.0/angular.min.js"></script>
-<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.5.0/angular-sanitize.min.js"></script>
+<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular.min.js"></script>
+<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular-route.js"></script>
+<!-- <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.6.0/angular-sanitize.min.js"></script> -->
 <script src="//cdnjs.cloudflare.com/ajax/libs/Chart.js/1.0.2/Chart.min.js"></script>
 <script src="assets/angular-chart.min.js"></script>
 <script src="//cdn.rawgit.com/pinedance/f53dd1b0402c4574467c/raw/fe0bad830381fcd7aea7c8b959384fe800f12529/prototype.js"></script>
@@ -56,7 +43,10 @@
 <script type="text/javascript" src="//d3js.org/d3.v3.min.js"></script>
 <script type="text/javascript" src="//rawgit.com/jasondavies/d3-cloud/master/build/d3.layout.cloud.js"></script>
 
-<script src="assets/main.js"></script>
+<script src="assets/ng-app.js"></script>
+<script src="assets/ng-config.js"></script>
+<script src="assets/ng-factory.js"></script>
+<script src="assets/ng-controller.js"></script>
 
 
 </body>

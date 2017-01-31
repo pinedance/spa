@@ -1,0 +1,20 @@
+<div class="container">
+	<div class="row">
+		<div class="col-md-12">
+
+			<h2 class="form-inline">
+				<i class="fa fa-refresh fa-fw" ng-class="{'fa-spin': spin}"></i>
+			원/미국달러 <small>매매기준율</small> (
+				<input type="text" class="form-control" style="width:40px; text-align:center" ng-model="monthlength" ng-change="updatemonthlength()">
+			개월)
+			</h2>
+			<br>
+			<canvas id="lineMonthly" class="chart chart-line" chart-data="dataMonthly"
+			  chart-labels="labelsMonthly" chart-legend="true" chart-series="seriesMonthly" chart-colors="linecolor"
+			  chart-click="onClick" >
+			</canvas>
+
+		</div>
+	</div>
+
+</div>
