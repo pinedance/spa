@@ -43,6 +43,7 @@ angular.module("finance")
 })
 
 .factory("fApi", function(){
+	
 	var _api = {}
 
 	_api.ecos = {
@@ -50,7 +51,7 @@ angular.module("finance")
 		// http://ecos.bok.or.kr/jsp/openapi/OpenApiController.jsp
 		new : function(){
 			return {
-				base: "http://myapibox.herokuapp.com/api/finance/ecos?endpoint=",
+				base: "https://script.google.com/macros/s/AKfycbyCpxdvAwV6ugWj37pcs6BnTqvM7Sxs4JKw6S0SBdVaVQx1taw/exec?order=redirect&endpoint=",
 				start_no: "1",
 				end_no: "24",
 			}
@@ -72,8 +73,7 @@ angular.module("finance")
 		apiconf: function(){
 			return {
 				headers : {
-					"Content-Type": "application/json;charset=utf-8"
-	                // "Content-Type": "application/json"
+					// "Content-Type": "application/json;charset=utf-8"
 				},
 	            data: "" // 이게 없으면 Content-Type이 설정되지 않음 //
 			}

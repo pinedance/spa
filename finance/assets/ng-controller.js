@@ -5,7 +5,7 @@ angular.module("finance")
 
 })
 
-.controller("economyLeadingIndexCtrl", function($scope, $http, myapibox, fApi, fDay, d3){
+.controller("economyLeadingIndexCtrl", function($scope, $http, fApi, fDay, d3){
 
 	function getApiPromises(){
 		var apiQuery1 = fApi.ecos.new()
@@ -29,6 +29,8 @@ angular.module("finance")
 		$scope.spin = false
 
 		var values = [ _values[0].data ]
+
+console.log( values)
 
 		var it = values[0].StatisticSearch.row.map(function(e,i,arr){
 			return e.DATA_VALUE
@@ -71,7 +73,7 @@ angular.module("finance")
 
 })
 
-.controller("apartmentPriceIndexCtrl", function($scope, $http, myapibox, fApi, fDay, d3){
+.controller("apartmentPriceIndexCtrl", function($scope, $http, fApi, fDay, d3){
 
 	$scope.locations = ["전국", "서울", "대전"]
 
@@ -169,7 +171,7 @@ angular.module("finance")
 
 })
 
-.controller("currencyExchangeRatesCtrl", function($scope, $http, myapibox, fApi, fDay, d3){
+.controller("currencyExchangeRatesCtrl", function($scope, $http, fApi, fDay, d3){
 
 	$scope.longEnd = 5
 	$scope.monthlength = 3
@@ -242,7 +244,7 @@ angular.module("finance")
 
 })
 
-.controller("interestSpreadCtrl", function ($scope, $http, myapibox, fApi, fDay, d3) {
+.controller("interestSpreadCtrl", function ($scope, $http, fApi, fDay, d3) {
 
 // Javascript 숫자에 천단위로 콤마(,) 찍기 thousands() 함수 추가 From prototype.js
 

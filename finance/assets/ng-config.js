@@ -1,16 +1,5 @@
 angular.module("finance")
 
-.constant("myapibox", {
-		rooturl: "http://myapibox.herokuapp.com/api/finance/",
-		conf : {
-			headers : {
-				// "Content-Type": "application/json;charset=utf-8"
-                "Content-Type": "application/json"
-			},
-            data: "" // 이게 없으면 Content-Type이 설정되지 않음 //
-		}
-})
-
 .config( function( $routeProvider ) { $routeProvider
 	.when("/", {
 		templateUrl : "views/main.html",
